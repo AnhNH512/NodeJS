@@ -5,7 +5,13 @@
   "repository": "https://github.com/AnhNH512/NodeJS.git",
   "author": "HoangAnh <nguyenhoanganh05122003@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
   "dependencies": {
-    "mysql2": "^3.10.2"
+    "express": "^4.19.2",
+    "mysql2": "^3.10.2",
+    "nodemon": "^3.1.4"
   }
 }
