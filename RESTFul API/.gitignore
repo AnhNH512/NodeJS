@@ -1,0 +1,4 @@
+# bỏ qua file node_modules không đẩy lên github
+node_modules/
+
+yarn-error.log/
