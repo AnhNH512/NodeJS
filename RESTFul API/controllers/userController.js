@@ -79,62 +79,53 @@ class UserController {
           return res.status(400).send('Empty file.');
         }
 
-        const headers = data[0]; // Lấy hàng đầu tiên làm tiêu đề
-        const rows = data.slice(1); // Lấy các hàng còn lại làm dữ liệu
+        const hiddenHeaders = data[0]; // Lấy hàng đầu tiên làm mã ẩn
+        const displayHeaders = data[1]; // Lấy hàng thứ hai làm tiêu đề hiển thị
+        const rows = data.slice(2); // Lấy các hàng còn lại làm dữ liệu
 
         // Chuyển đổi dữ liệu thành mảng đối tượng
-        const objects = rows.map((row) => {
+        const DanhSachData = rows.map((row) => {
           let obj = {};
           row.forEach((cell, index) => {
-            obj[headers[index]] = cell;
+            obj[hiddenHeaders[index]] = cell;
           });
           return obj;
         });
 
-        console.log('Headers:', headers);
+        console.log('Hidden Headers:', hiddenHeaders);
+        console.log('Display Headers:', displayHeaders);
         console.log('Rows:', rows);
-        console.log('Objects:', objects);
-
+        console.log('DanhSachData:', DanhSachData);
+        DanhSachData.forEach((data) => {
+          User.addUser(data);
+        });
         // Gửi dữ liệu về cho client
         res.json(
-          successResponse(objects, 'Import danh sách người dùng thành công'),
+          successResponse(null, 'Import danh sách người dùng thành công'),
         );
-        // res.status(200).send({headers, rows});
       } catch (error) {
         console.error('Error reading file:', error);
         res.status(500).send('Error reading file.');
       }
     });
-    // try {
-    //   User.uploadFile(req, res);
-    //   res.json(successResponse(null, 'Import danh sách người dùng thành công'));
-    // } catch {
-    //   res.json(errorResponse('Import danh sách người dùng thất bại'));
-    // }
   }
 
   static dowloadFile(req, res) {
     try {
       // Tạo workbook và worksheet
       const wb = xlsx.utils.book_new();
+      // Dữ liệu với mã ẩn và tiêu đề hiển thị
       const ws_data = [
         ['name', 'email'], // Mã ẩn
         ['Tên người dùng', 'Email'], // Tiêu đề hiển thị
+        ['Nguyễn Văn A', 'a@example.com'], // Dữ liệu mẫu
+        ['Trần Thị B', 'b@example.com'], // Dữ liệu mẫu
       ];
       const ws = xlsx.utils.aoa_to_sheet(ws_data);
       console.log('ws', ws);
-      // ws.A1.hidden = true;
-      ws.B1.hidden = true;
-      // ws['!rows'] = [
-      //   // Ẩn dòng chứa "name" và "email"
-      //   {hidden: true}, // Ẩn dòng đầu tiên
-      //   {hidden: true}, // Ẩn dòng thứ hai
-      // ];
-      // // Định dạng các cột trong worksheet để ẩn "name" và "email"
-      // ws['!cols'] = [
-      //   {hidden: true}, // Ẩn cột đầu tiên (name)
-      //   {hidden: true}, // Ẩn cột thứ hai (email)
-      // ];
+
+      // Thiết lập độ rộng cột để ẩn cột
+      ws['!rows'] = [{hidden: true}]; // Hàng đầu tiên ẩn
       // Thêm worksheet vào workbook
       xlsx.utils.book_append_sheet(wb, ws, 'Template');
 
@@ -162,7 +153,7 @@ class UserController {
         res.json(
           successResponse(
             {downloadLink: fileUrl},
-            'Import danh sách người dùng thành công',
+            'Tải danh sách người dùng thành công',
           ),
         );
         // res.json({downloadLink: fileUrl});
